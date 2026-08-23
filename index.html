@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Case File: Just Mercy Research Clearance</title>
+<style>
+  :root{
+    --paper: #f0e6d2;
+    --paper-dark: #e3d5b3;
+    --kraft: #d9c9a3;
+    --group-fill: #ede3c8;
+    --ink: #2b2b24;
+    --navy: #1f2a3a;
+    --red: #8b1e1e;
+    --red-dark: #6b1414;
+    --green: #2f5233;
+    --gold: #a3792e;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; min-height:100vh;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(0,0,0,0.03), transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(0,0,0,0.04), transparent 40%),
+      var(--paper);
+    color:var(--ink);
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+  .wrap{max-width:800px; margin:0 auto; padding:32px 20px 80px;}
+
+  .folder-tabs{display:flex; gap:5px; margin-bottom:-2px; padding-left:8px; flex-wrap:wrap;}
+  .tab{
+    flex:1; min-width:70px; text-align:center; padding:7px 4px; font-family:'Courier New', monospace;
+    font-size:10.5px; letter-spacing:0.3px; border:2px solid var(--ink); border-bottom:none;
+    border-radius:6px 6px 0 0; background:var(--kraft); color:#6b5f45; font-weight:bold;
+    transition: background 0.3s, color 0.3s;
+  }
+  .tab.active{background:var(--navy); color:var(--paper);}
+  .tab.done{background:var(--green); color:var(--paper);}
+
+  .folder{
+    border:2px solid var(--ink); border-radius:2px 10px 10px 10px;
+    background:var(--paper); padding:28px 30px; position:relative;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  }
+
+  .stamp{
+    position:absolute; top:18px; right:22px; border:3px solid var(--red);
+    color:var(--red); font-family:'Courier New', monospace; font-weight:bold;
+    font-size:11px; letter-spacing:1px; padding:5px 10px; border-radius:4px;
+    transform:rotate(6deg); opacity:0.85; text-align:center;
+  }
+  .stamp.granted{border-color:var(--green); color:var(--green); transform:rotate(-4deg);}
+
+  h1{font-size:25px; margin:0 0 2px; color:var(--navy); letter-spacing:0.5px;}
+  .subtitle{font-family:'Courier New',monospace; font-size:11.5px; color:#7a6f56; margin-bottom:18px; letter-spacing:0.5px;}
+
+  .station-label{
+    display:inline-block; background:var(--navy); color:var(--paper);
+    font-family:'Courier New',monospace; font-size:11px; padding:4px 10px;
+    border-radius:3px; margin-bottom:10px; letter-spacing:1px;
+  }
+
+  .notes-intro{font-size:14.5px; line-height:1.5; color:#444; margin-bottom:16px;}
+
+  table.notes-table{width:100%; border-collapse:collapse; margin-bottom:14px; font-size:13.5px;}
+  table.notes-table th{background:var(--navy); color:var(--paper); text-align:left; padding:8px 10px; font-size:12.5px;}
+  table.notes-table td{border:1px solid #c9bb98; padding:8px 10px; vertical-align:top;}
+  table.notes-table td.sym{font-family:'Courier New',monospace; font-weight:bold; color:var(--red); white-space:nowrap; width:110px;}
+  table.notes-table tr.group-row td{background:var(--group-fill); font-weight:bold; font-size:11.5px; color:var(--navy); padding:6px 10px;}
+
+  .tip-list{margin:0 0 16px; padding-left:20px; font-size:14.5px; line-height:1.6;}
+  .tip-list li{margin-bottom:8px;}
+
+  .callout{background:var(--paper-dark); border-left:4px solid var(--gold); padding:12px 14px; font-size:13.5px; line-height:1.5; margin-bottom:6px;}
+  .callout .lbl{font-family:'Courier New',monospace; font-size:10.5px; color:var(--red); font-weight:bold; letter-spacing:1px; display:block; margin-bottom:6px;}
+
+  .prompt{font-size:15.5px; font-weight:bold; margin:6px 0 12px;}
+  .q-progress{font-family:'Courier New',monospace; font-size:11px; color:var(--navy); margin-bottom:6px; letter-spacing:0.5px;}
+
+  .options{display:flex; flex-direction:column; gap:9px; margin-bottom:8px;}
+  .opt{
+    text-align:left; padding:11px 13px; border:2px solid var(--ink); background:#fff;
+    border-radius:6px; cursor:pointer; font-family:Georgia,serif; font-size:14.5px;
+    transition: background 0.15s, transform 0.1s; line-height:1.4;
+  }
+  .opt:hover{background:#faf5e8;}
+  .opt:active{transform:scale(0.99);}
+  .opt.correct{background:#e2efe3; border-color:var(--green);}
+  .opt.wrong{background:#f5e2e2; border-color:var(--red);}
+  .opt[disabled]{cursor:default;}
+
+  .feedback{margin-top:12px; padding:11px 13px; border-radius:6px; font-size:14px; line-height:1.5; display:none;}
+  .feedback.show{display:block;}
+  .feedback.good{background:#e2efe3; border:2px solid var(--green); color:var(--green);}
+  .feedback.bad{background:#f5e2e2; border:2px solid var(--red); color:var(--red-dark);}
+
+  .code-reveal{margin-top:16px; padding:14px; background:var(--navy); color:var(--paper); border-radius:6px; text-align:center; display:none;}
+  .code-reveal.show{display:block;}
+  .code-reveal .word{font-family:'Courier New',monospace; font-size:22px; letter-spacing:4px; font-weight:bold; color:#f2c94c;}
+  .code-reveal .caption{font-size:11px; letter-spacing:1px; margin-top:4px; opacity:0.8;}
+
+  button.continue{
+    margin-top:16px; background:var(--red); color:#fff; border:none; padding:12px 22px;
+    border-radius:6px; font-size:14.5px; font-family:Georgia,serif; cursor:pointer;
+    display:none; box-shadow:0 3px 0 var(--red-dark);
+  }
+  button.continue.show{display:inline-block;}
+  button.continue:active{box-shadow:none; transform:translateY(3px);}
+
+  .final h1{font-size:29px;}
+  .code-trail{display:flex; gap:8px; flex-wrap:wrap; margin:18px 0;}
+  .code-chip{font-family:'Courier New',monospace; background:var(--kraft); border:2px solid var(--ink); padding:6px 10px; border-radius:5px; font-size:13px; font-weight:bold;}
+  .final-word{font-size:40px; font-family:'Courier New',monospace; letter-spacing:8px; text-align:center; color:var(--red); margin:22px 0; font-weight:bold;}
+  .restart{margin-top:20px; background:var(--navy); color:var(--paper); border:none; padding:10px 18px; border-radius:6px; cursor:pointer; font-family:Georgia,serif;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="folder-tabs" id="tabs"></div>
+  <div class="folder" id="folder"></div>
+</div>
+
+<script>
+// ============================================================
+// NOTES CONTENT
+// ============================================================
+const notes = [
+  { // Station 1
+    title: "Search Operators Field Guide",
+    intro: "Read this page before you answer Station 1's questions. These are the symbols and commands real researchers use to search faster and more precisely.",
+    type: "table",
+    headers: ["Symbol / Command", "What It Does", "Example"],
+    groups: [
+      { label: "SEARCH OPERATORS \u2014 shape how your keywords are matched", rows: [
+        ["\u201c \u201d", "Searches for that exact phrase, in that exact order.", "\u201cjuvenile justice reform\u201d"],
+        ["\u2212", "Excludes a word from your results. No space after it.", "sentencing \u2212marijuana"],
+        ["OR", "Returns results with either term (must be capitalized).", "\u201cdeath penalty\u201d OR \u201ccapital punishment\u201d"],
+        ["*", "A wildcard \u2014 stands in for one or more unknown words.", "Stevenson * mercy"],
+      ]},
+      { label: "SITE-NARROWING COMMANDS \u2014 target where and what you search", rows: [
+        ["site:", "Limits results to one specific website or domain type \u2014 great for the .gov/.org/.edu rule.", "site:.gov drug sentencing"],
+        ["filetype:", "Finds a specific file type, like PDF reports or studies.", "sentencing reform filetype:pdf"],
+        ["related:", "Finds websites similar to one you already trust.", "related:sentencingproject.org"],
+        ["intitle:", "Finds pages with that word in the page's title.", "intitle:sentencing reform"],
+      ]},
+    ],
+    callout: { label: "FIELD NOTE", text: "Combining operators makes searches even sharper \u2014 for example: site:.gov \u201cjuvenile detention\u201d \u2212adult finds only government sources with that exact phrase, while leaving out results about adult detention." },
+  },
+  { // Station 2
+    title: "The CRAAP Test",
+    intro: "Read this page before you answer Station 2's questions. Run every source through these five checks before it goes in your case file.",
+    type: "table",
+    headers: ["CRAAP Category", "What It Means", "Questions to Ask"],
+    groups: [
+      { label: null, rows: [
+        ["C \u2014 Current", "The timeliness of the information.", "Was it published recently (last 3\u20135 years)? Could an older source still work? Has it been updated?"],
+        ["R \u2014 Relevant", "The importance of the info for your needs.", "Does it support your claim? Is it written for the right audience?"],
+        ["A \u2014 Authoritative", "The credentials of the source.", "Who is the author or publisher? Are they qualified? Does the URL reveal anything?"],
+        ["A \u2014 Accurate", "The reliability and correctness of the content.", "Was it reviewed or edited? Do they cite their own sources? Any red flags like bias or errors?"],
+        ["P \u2014 Purposeful", "The reason the information exists.", "Is it meant to inform, persuade, sell, or entertain? Is it objective?"],
+      ]},
+    ],
+    callout: { label: "DOMAIN CHEAT SHEET", text: ".gov = U.S. government \u00b7 .edu = academic institution \u00b7 .org = nonprofit \u00b7 .com = company \u00b7 .net = network \u00b7 .mil = military. If you can't find a date or publisher at all, that's a red flag itself." },
+  },
+  { // Station 3
+    title: "Paraphrasing Without Plagiarizing",
+    intro: "Read this page before you answer Station 3's questions.",
+    type: "list",
+    tips: [
+      "Read the passage, then look away before you write. Restate the idea from memory, in your own words.",
+      "Change both the words AND the sentence structure. Swapping in a few synonyms is still plagiarism.",
+      "Keep the original meaning fully intact. Never distort, oversimplify, or exaggerate what the source said.",
+      "Still cite the source. Removing quotation marks does not remove your responsibility to credit the idea.",
+      "If you need to keep a distinctive phrase, put it in quotation marks inside your paraphrase.",
+      "Check side-by-side when you're done. If more than a few words in a row match, revise again.",
+    ],
+    callout: { label: "EXAMPLE", text: "Original: \u201cFast fashion companies often prioritize speed and low cost over fair wages, leading many workers to labor in unsafe conditions for very little pay.\u201d &mdash; Acceptable paraphrase: Because fast fashion brands push to produce clothing quickly and cheaply, garment workers frequently end up underpaid and working in hazardous conditions." },
+  },
+  { // Station 4
+    title: "MLA Works Cited \u2014 Core Elements",
+    intro: "Read this page before you answer Station 4's questions. mybib.com can build these for you, but you still need to know what a correct entry looks like.",
+    type: "table",
+    preText: "MLA 9 Core Elements (repeat 3\u20139 as needed): Author \u00b7 Title of source \u00b7 Title of container \u00b7 Other contributors \u00b7 Version \u00b7 Numbers \u00b7 Publisher \u00b7 Publication date \u00b7 Location.",
+    headers: ["Source Type", "General Format", "Example"],
+    groups: [
+      { label: null, rows: [
+        ["Webpage", "Author (if available). \u201cWebpage Title.\u201d Website, Publisher, Publication date, URL.", "\u201cRace and Drug Sentencing in America.\u201d The Sentencing Project, 2023, sentencingproject.org."],
+        ["Entire Print Book", "Last, First. Title of Book. Publisher, Publication date.", "Stevenson, Bryan. Just Mercy. Spiegel & Grau, 2014."],
+        ["Database Journal Article", "Last, First. \u201cTitle of Article.\u201d Journal, vol. #, no. #, date, pp. #\u2013##. Database, URL.", "Greiner, Romy. \u201cFactors Influencing Farmers' Participation.\u201d Australian Journal of Agricultural Economics, 2015, pp. 1\u201321. Wiley Online Library."],
+      ]},
+    ],
+    callout: { label: "FIELD NOTE", text: "Citation generators like mybib.com are helpful but not perfect \u2014 always double-check punctuation, italics, and quotation marks against a real example." },
+  },
+  { // Station 5
+    title: "MLA In-Text Citations",
+    intro: "Read this page before you answer Station 5's questions. Citations are part of the sentence \u2014 periods go AFTER the citation, never before.",
+    type: "table",
+    headers: ["Situation", "Example"],
+    groups: [
+      { label: null, rows: [
+        ["Author + page, direct quote", "Romantic poetry is characterized by the \u201cspontaneous overflow of powerful feelings\u201d (Wordsworth 263)."],
+        ["Author + page, paraphrase (no quote)", "Wordsworth extensively explored the role of emotion in the creative process (263)."],
+        ["Two authors", "(Smith and Torres 246)"],
+        ["Three or more authors", "(McPherson et al. 87)"],
+        ["Author known, no page available", "School has been described as \u201cmore than a waste of time\u201d (Edwards)."],
+        ["No author \u2014 use article title + page", "(\u201cImpact of Global Warming\u201d 6)"],
+      ]},
+    ],
+    callout: { label: "FIELD NOTE", text: "Every embedded quote needs a lead-in (Ex: \u201cStevenson states, \u2018 ____ \u2019 (Stevenson 15).\u201d) \u2014 a quote should never be dropped into a paragraph with no introduction." },
+  },
+];
+
+// ============================================================
+// STATIONS: metadata + 3 questions each
+// ============================================================
+const stations = [
+  {
+    label: "STATION 1 of 5", title: "Locate the Files", skill: "Library Research & Search Strategy",
+    code: "TRACKED", codeCaption: "You've tracked down a focused search strategy.",
+    questions: [
+      { prompt: "Your topic category is <b>Drug-Related Laws</b> (racial disparities in sentencing). Which search phrase is most likely to return focused, usable results?",
+        options: [
+          { text: "\u201cdrugs\u201d", correct:false, fb:"Too broad \u2014 you'll get thousands of unrelated results." },
+          { text: "\u201cwar on drugs history documentary 1970s Nixon speech transcript\u201d", correct:false, fb:"Too narrow and oddly specific \u2014 a search this long usually returns almost nothing." },
+          { text: "\u201cdrug sentencing racial disparities\u201d", correct:true, fb:"Specific enough to be searchable, broad enough to return real results \u2014 the sweet spot." },
+          { text: "\u201cis weed bad\u201d", correct:false, fb:"Reads like a question, not a research keyword search." },
+        ]},
+      { prompt: "Which search correctly limits your results to ONLY government sources about drug sentencing?",
+        options: [
+          { text: "drug sentencing .gov", correct:false, fb:"This just adds \u201c.gov\u201d as a keyword \u2014 it doesn't actually limit the domain." },
+          { text: "site:.gov drug sentencing", correct:true, fb:"Correct \u2014 site: is a command, used exactly like this." },
+          { text: "\u201csite:.gov\u201d drug sentencing", correct:false, fb:"Putting site: in quotation marks turns it into a literal phrase search instead of a command." },
+          { text: "gov: drug sentencing", correct:false, fb:"The command is site:, not gov:." },
+        ]},
+      { prompt: "You want results about \u201cjuvenile sentencing\u201d but NOT about the death penalty. Which search is correctly formatted?",
+        options: [
+          { text: "juvenile sentencing -death penalty", correct:false, fb:"This only excludes \u201cdeath\u201d and leaves \u201cpenalty\u201d as a regular keyword." },
+          { text: "juvenile sentencing exclude death penalty", correct:false, fb:"\u201cExclude\u201d isn't a real search operator \u2014 it'll just be treated as a keyword." },
+          { text: "juvenile sentencing -\u201cdeath penalty\u201d", correct:true, fb:"Correct \u2014 the minus sign directly before a quoted phrase excludes the whole phrase." },
+          { text: "juvenile sentencing - death - penalty", correct:false, fb:"Spaces after the minus sign break the exclusion \u2014 and this excludes two separate words, not the phrase." },
+        ]},
+    ],
+  },
+  {
+    label: "STATION 2 of 5", title: "The CRAAP Trap", skill: "Evaluating Sources with the CRAAP Test",
+    code: "RELIABLE", codeCaption: "You've flagged an unreliable source before it made it into your essay.",
+    questions: [
+      { prompt: "A source: a website article titled \u201cWhy Sentencing Is Broken,\u201d posted on a personal blog. No author listed, no sources cited, published in 2011. Which CRAAP category raises the BIGGEST red flag?",
+        options: [
+          { text: "Currency \u2014 it's a bit old", correct:false, fb:"2011 could be a concern, but it's not the biggest problem here." },
+          { text: "Relevance \u2014 the topic doesn't relate to your paper", correct:false, fb:"The topic is actually relevant \u2014 the problem is who's behind it." },
+          { text: "Purpose \u2014 it's trying to sell you something", correct:false, fb:"There's a bias concern, but the bigger issue is no identifiable author at all." },
+          { text: "Authority \u2014 no author, no credentials, no way to check who wrote it", correct:true, fb:"Exactly \u2014 and it also fails this assignment's .gov/.org/.edu requirement outright." },
+        ]},
+      { prompt: "Your topic is current drug sentencing policy. Which source's publication date raises the biggest Currency concern?",
+        options: [
+          { text: "A 2024 government report", correct:false, fb:"This is recent \u2014 no Currency concern here." },
+          { text: "A 2023 nonprofit report", correct:false, fb:"Also recent \u2014 not the concern." },
+          { text: "A 1998 blog post about sentencing laws", correct:true, fb:"Correct \u2014 sentencing laws and policy change over time, and 1998 is far too old for a current-policy topic." },
+          { text: "A 2022 .edu article", correct:false, fb:"Still fairly recent \u2014 not the biggest concern of the four." },
+        ]},
+      { prompt: "A source presents statistics but never explains where the numbers came from, and no editor or fact-checking process is mentioned. Which CRAAP category is the biggest concern?",
+        options: [
+          { text: "Currency", correct:false, fb:"This isn't about how old the source is." },
+          { text: "Relevance", correct:false, fb:"This isn't about whether it fits your topic." },
+          { text: "Accurate", correct:true, fb:"Correct \u2014 not citing where data came from and having no review process are classic Accuracy red flags." },
+          { text: "Purposeful", correct:false, fb:"This is more about verifiability than the source's intent." },
+        ]},
+    ],
+  },
+  {
+    label: "STATION 3 of 5", title: "In Your Own Words", skill: "Paraphrasing Evidence",
+    code: "UNIQUE", codeCaption: "You've put the evidence in your own, unique words.",
+    questions: [
+      { prompt: "Original passage: <i>\u201cThe client had never been arrested before, but a single detail \u2014 his truck seen near the scene \u2014 became the centerpiece of the prosecution's case, despite no physical evidence tying him to the crime.\u201d</i><br><br>Which option is an <b>acceptable paraphrase</b>?",
+        options: [
+          { text: "\u201cThe client had never been arrested before, but a single detail \u2014 his truck seen near the scene \u2014 became the centerpiece of the prosecution's case.\u201d", correct:false, fb:"This is the original sentence with a piece trimmed off \u2014 a direct quote, not a paraphrase." },
+          { text: "The client was guilty because his truck was seen near the crime scene.", correct:false, fb:"This distorts the meaning \u2014 the passage points out unfair circumstantial evidence, not guilt." },
+          { text: "Prosecutors built their entire case around one circumstantial clue \u2014 a truck spotted near the scene \u2014 even though they had no physical evidence connecting the client to the crime at all.", correct:true, fb:"This captures the same idea with genuinely different structure and wording \u2014 a real paraphrase." },
+          { text: "The client had never been arrested before, but one detail \u2014 his truck being seen nearby \u2014 became the center of the prosecution's case, even with no physical evidence linking him.", correct:false, fb:"This just swaps a few words \u2014 the structure is still the original author's. Still plagiarism." },
+        ]},
+      { prompt: "Which strategy is the SAFEST way to avoid accidental plagiarism when paraphrasing?",
+        options: [
+          { text: "Replace a few key words with synonyms and keep the rest the same", correct:false, fb:"This is a light word-swap \u2014 still counts as plagiarism." },
+          { text: "Read the passage, then look away and restate the idea from memory in your own words", correct:true, fb:"Correct \u2014 this forces genuinely different sentence structure and vocabulary." },
+          { text: "Copy the sentence exactly, then remove the quotation marks", correct:false, fb:"This is one of the most common accidental-plagiarism mistakes." },
+          { text: "Rearrange the order of the clauses but keep the same words", correct:false, fb:"Reordering isn't enough if the words themselves are unchanged." },
+        ]},
+      { prompt: "A student paraphrases a source but keeps one highly distinctive three-word phrase from the original without quotation marks. Is this a problem?",
+        options: [
+          { text: "No \u2014 distinctive phrases are always fine to reuse", correct:false, fb:"Distinctiveness doesn't make it safe to reuse without quotation marks." },
+          { text: "Yes \u2014 any borrowed phrase, even a short one, needs quotation marks", correct:true, fb:"Correct \u2014 length doesn't determine whether wording needs to be quoted." },
+          { text: "No, since the rest of the sentence was changed", correct:false, fb:"Changing the rest of the sentence doesn't excuse reusing this specific phrase unmarked." },
+          { text: "Yes, but only if the phrase is more than ten words long", correct:false, fb:"There's no word-count threshold \u2014 borrowed wording needs quotation marks regardless of length." },
+        ]},
+    ],
+  },
+  {
+    label: "STATION 4 of 5", title: "Cite It Right", skill: "Using mybib.com to Build a Works Cited Entry",
+    code: "SOURCED", codeCaption: "Your evidence is now properly sourced and citable.",
+    questions: [
+      { prompt: "Source info: no individual author listed &middot; Title: \u201cRace and Drug Sentencing in America\u201d &middot; Website: The Sentencing Project &middot; sentencingproject.org &middot; published 2023. Which entry is correctly formatted MLA?",
+        options: [
+          { text: "2023. \u201cRace and Drug Sentencing in America.\u201d sentencingproject.org.", correct:false, fb:"MLA entries don't start with the date, and the website name is missing." },
+          { text: "The Sentencing Project. Race and Drug Sentencing in America. 2023, sentencingproject.org.", correct:false, fb:"The article title needs quotation marks, not italics." },
+          { text: "Sentencing Project, The. \u201cRace and Drug Sentencing in America\u201d sentencingproject.org 2023.", correct:false, fb:"Missing punctuation between elements and after the title's closing quotation mark." },
+          { text: "\u201cRace and Drug Sentencing in America.\u201d The Sentencing Project, 2023, sentencingproject.org.", correct:true, fb:"Correct MLA order and punctuation: title in quotes, website italicized as container, date, URL." },
+        ]},
+      { prompt: "Which is the correctly formatted MLA Works Cited entry for the book <i>Just Mercy</i> by Bryan Stevenson, published by Spiegel & Grau in 2014?",
+        options: [
+          { text: "Stevenson, Bryan. Just Mercy. Spiegel & Grau, 2014.", correct:true, fb:"Correct: Last, First. Title of Book. Publisher, Publication date." },
+          { text: "Bryan Stevenson. \u201cJust Mercy.\u201d Spiegel & Grau, 2014.", correct:false, fb:"Author name isn't inverted, and book titles are italicized, not quoted." },
+          { text: "Stevenson, B. (2014). Just Mercy. Spiegel & Grau.", correct:false, fb:"This is APA style, not MLA." },
+          { text: "Just Mercy. Stevenson, Bryan. 2014, Spiegel & Grau.", correct:false, fb:"Wrong element order \u2014 title should not come first." },
+        ]},
+      { prompt: "Which of these is NOT one of the MLA 9 core elements used to build a Works Cited entry?",
+        options: [
+          { text: "Title of source", correct:false, fb:"This is a core element." },
+          { text: "Publisher", correct:false, fb:"This is a core element." },
+          { text: "Font size", correct:true, fb:"Correct \u2014 font size is a paper-formatting rule, not a citation element." },
+          { text: "Publication date", correct:false, fb:"This is a core element." },
+        ]},
+    ],
+  },
+  {
+    label: "STATION 5 of 5", title: "Paper Perfect", skill: "MLA Formatting & In-Text Citations",
+    code: "TIDY", codeCaption: "Your paper is properly formatted and cited \u2014 case file complete.",
+    questions: [
+      { prompt: "Which sentence is correctly formatted per this assignment's MLA rules (lead-in + embedded quote + correct in-text citation)?",
+        options: [
+          { text: "\u201cThe death of innocent people is a risk inherent in the death penalty.\u201d", correct:false, fb:"No lead-in and no citation \u2014 a quote can't just be dropped in." },
+          { text: "Stevenson explains that the death of innocent people is a risk inherent in the death penalty (page 15).", correct:false, fb:"Not in quotation marks despite using Stevenson's exact words, and the citation format is wrong." },
+          { text: "In Just Mercy, Stevenson states, \u201cthe death of innocent people is a risk inherent in the death penalty\u201d (Stevenson 15).", correct:true, fb:"Clear lead-in, smoothly embedded quote, correct (Author page#) format." },
+          { text: "Stevenson says \"the death of innocent people\" (Stevenson, pg. 15) is a risk of capital punishment.", correct:false, fb:"Citation format should be (Stevenson 15) \u2014 no comma, no \u201cpg.\u201d" },
+        ]},
+      { prompt: "You know the author's name but could not find any page number (common on websites). How should you cite a quote from them?",
+        options: [
+          { text: "(Smith, page unknown)", correct:false, fb:"MLA doesn't use placeholder text like this." },
+          { text: "(Smith n.d.)", correct:false, fb:"\u201cn.d.\u201d is an APA convention, not MLA." },
+          { text: "(Smith)", correct:true, fb:"Correct \u2014 when no page number is available, just use the author's last name." },
+          { text: "(Smith, para. 1)", correct:false, fb:"Not the standard format from this guide \u2014 just the author's name alone is expected." },
+        ]},
+      { prompt: "You're citing a source written by three authors: Green, Diaz, and Nguyen. What's the correct in-text format?",
+        options: [
+          { text: "(Green, Diaz, and Nguyen 45)", correct:false, fb:"For 3+ authors, MLA doesn't list every name." },
+          { text: "(Green et al. 45)", correct:true, fb:"Correct \u2014 first author's last name plus \u201cet al.\u201d for three or more authors." },
+          { text: "(Green & Diaz & Nguyen 45)", correct:false, fb:"MLA doesn't use ampersands between author names." },
+          { text: "(Green, et al, pg. 45)", correct:false, fb:"Extra comma and \u201cpg.\u201d aren't used in MLA in-text citations." },
+        ]},
+    ],
+  },
+];
+
+// ============================================================
+// STATE + RENDER
+// ============================================================
+let stationIdx = 0;
+let phase = 'notes'; // 'notes' | 'question'
+let questionIdx = 0;
+let collected = [];
+
+function renderTabs(){
+  const tabs = document.getElementById('tabs');
+  tabs.innerHTML = '';
+  stations.forEach((s,i)=>{
+    const d = document.createElement('div');
+    const isActive = i === stationIdx;
+    d.className = 'tab' + (isActive ? ' active' : '') + (i < stationIdx ? ' done' : '');
+    d.textContent = 'FILE ' + (i+1);
+    tabs.appendChild(d);
+  });
+}
+
+function renderNotesTable(n){
+  let html = `<table class="notes-table"><thead><tr>`;
+  n.headers.forEach(h => html += `<th>${h}</th>`);
+  html += `</tr></thead><tbody>`;
+  n.groups.forEach(g => {
+    if(g.label){
+      html += `<tr class="group-row"><td colspan="${n.headers.length}">${g.label}</td></tr>`;
+    }
+    g.rows.forEach(row => {
+      html += `<tr>`;
+      row.forEach((cell, ci) => {
+        html += `<td class="${ci===0 ? 'sym' : ''}">${cell}</td>`;
+      });
+      html += `</tr>`;
+    });
+  });
+  html += `</tbody></table>`;
+  return html;
+}
+
+function renderNotesPage(){
+  renderTabs();
+  const n = notes[stationIdx];
+  const f = document.getElementById('folder');
+  let bodyHtml = '';
+  if(n.preText) bodyHtml += `<p class="notes-intro">${n.preText}</p>`;
+  if(n.type === 'table'){
+    bodyHtml += renderNotesTable(n);
+  } else if(n.type === 'list'){
+    bodyHtml += `<ul class="tip-list">` + n.tips.map(t=>`<li>${t}</li>`).join('') + `</ul>`;
+  }
+  f.innerHTML = `
+    <div class="stamp">READ<br>FIRST</div>
+    <span class="station-label">STATION ${stationIdx+1} NOTES</span>
+    <h1>${n.title}</h1>
+    <div class="subtitle">${n.intro}</div>
+    ${bodyHtml}
+    <div class="callout"><span class="lbl">${n.callout.label}</span>${n.callout.text}</div>
+    <button class="continue show" id="notesContinue">I've Read This &rarr; Start Questions</button>
+  `;
+  document.getElementById('notesContinue').onclick = ()=>{
+    phase = 'question';
+    questionIdx = 0;
+    renderQuestion();
+    window.scrollTo(0,0);
+  };
+}
+
+function renderQuestion(){
+  renderTabs();
+  const s = stations[stationIdx];
+  const q = s.questions[questionIdx];
+  const f = document.getElementById('folder');
+  f.innerHTML = `
+    <div class="stamp">CLEARANCE<br>PENDING</div>
+    <span class="station-label">${s.label}</span>
+    <h1>${s.title}</h1>
+    <div class="subtitle">SKILL FOCUS: ${s.skill.toUpperCase()}</div>
+    <div class="q-progress">QUESTION ${questionIdx+1} OF ${s.questions.length} &mdash; answer all ${s.questions.length} correctly to earn your code word</div>
+    <div class="prompt">${q.prompt}</div>
+    <div class="options" id="opts"></div>
+    <div class="feedback" id="fb"></div>
+    <div class="code-reveal" id="codeReveal">
+      <div class="word" id="codeWord"></div>
+      <div class="caption" id="codeCaption"></div>
+    </div>
+    <button class="continue" id="continueBtn"></button>
+  `;
+  const optsDiv = document.getElementById('opts');
+  q.options.forEach((opt, idx)=>{
+    const b = document.createElement('button');
+    b.className = 'opt';
+    b.innerHTML = opt.text;
+    b.onclick = ()=>handleAnswer(idx);
+    optsDiv.appendChild(b);
+  });
+}
+
+function handleAnswer(idx){
+  const s = stations[stationIdx];
+  const q = s.questions[questionIdx];
+  const opt = q.options[idx];
+  const buttons = document.querySelectorAll('.opt');
+  buttons.forEach(b=>b.disabled = opt.correct);
+  const chosenBtn = buttons[idx];
+  const fb = document.getElementById('fb');
+  fb.classList.add('show');
+  fb.textContent = opt.fb;
+
+  if(opt.correct){
+    chosenBtn.classList.add('correct');
+    fb.classList.add('good'); fb.classList.remove('bad');
+    const isLastQuestion = questionIdx === s.questions.length - 1;
+    const continueBtn = document.getElementById('continueBtn');
+    continueBtn.classList.add('show');
+
+    if(isLastQuestion){
+      document.querySelector('.stamp').innerHTML = 'CLEARANCE<br>GRANTED';
+      document.querySelector('.stamp').classList.add('granted');
+      const cr = document.getElementById('codeReveal');
+      cr.classList.add('show');
+      document.getElementById('codeWord').textContent = s.code;
+      document.getElementById('codeCaption').textContent = s.codeCaption;
+      continueBtn.textContent = stationIdx < stations.length - 1 ? 'Continue to Next File \u2192' : 'See Final Combination \u2192';
+      continueBtn.onclick = ()=>{
+        collected.push(s.code);
+        stationIdx++;
+        if(stationIdx < stations.length){ phase='notes'; renderNotesPage(); }
+        else { renderFinal(); }
+        window.scrollTo(0,0);
+      };
+    } else {
+      continueBtn.textContent = 'Next Question \u2192';
+      continueBtn.onclick = ()=>{
+        questionIdx++;
+        renderQuestion();
+        window.scrollTo(0,0);
+      };
+    }
+  } else {
+    chosenBtn.classList.add('wrong');
+    fb.classList.add('bad'); fb.classList.remove('good');
+    setTimeout(()=>{
+      chosenBtn.disabled = false;
+      chosenBtn.classList.remove('wrong');
+      buttons.forEach(b=>{ if(!opt.correct) b.disabled = false; });
+    }, 1400);
+  }
+}
+
+function renderFinal(){
+  document.getElementById('tabs').innerHTML = stations.map((s,i)=>`<div class="tab done">FILE ${i+1}</div>`).join('');
+  const f = document.getElementById('folder');
+  f.innerHTML = `
+    <div class="final">
+      <div class="stamp granted">CASE<br>CLOSED</div>
+      <h1>Research Clearance Granted</h1>
+      <div class="subtitle">EQUAL JUSTICE RESEARCH INITIATIVE &mdash; CASE FILE COMPLETE</div>
+      <p style="font-size:15px; line-height:1.6;">You cleared all five checkpoints (15 questions total). Here's the trail of code words you collected:</p>
+      <div class="code-trail">
+        ${collected.map(c=>`<div class="code-chip">${c}</div>`).join('')}
+      </div>
+      <p style="font-size:15px;">Read the first letter of each word in order:</p>
+      <div class="final-word">${collected.map(c=>c[0]).join('')}</div>
+      <p style="font-size:15px; line-height:1.6;">You can <b>TRUST</b> the research you gather this way &mdash; it's tracked, reliable, in your own words, properly sourced, and correctly formatted. That's exactly what Paragraphs 2 and 3 of your essay need.</p>
+      <button class="restart" onclick="restart()">Restart Escape Room</button>
+    </div>
+  `;
+}
+
+function restart(){
+  stationIdx = 0;
+  phase = 'notes';
+  questionIdx = 0;
+  collected = [];
+  renderNotesPage();
+  window.scrollTo(0,0);
+}
+
+renderNotesPage();
+</script>
+</body>
+</html>
