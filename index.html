@@ -28,6 +28,14 @@
   }
   .wrap{max-width:800px; margin:0 auto; padding:32px 20px 80px;}
 
+  .clock-bar{
+    display:flex; justify-content:space-between; align-items:center;
+    background:var(--navy); color:var(--paper); font-family:'Courier New',monospace;
+    font-size:13px; font-weight:bold; letter-spacing:1px; padding:8px 14px;
+    border-radius:6px; margin-bottom:10px; border:2px solid var(--ink);
+  }
+  .clock-bar #penaltyDisplay{color:#f2a3a3; font-size:11.5px;}
+
   .folder-tabs{display:flex; gap:5px; margin-bottom:-2px; padding-left:8px; flex-wrap:wrap;}
   .tab{
     flex:1; min-width:70px; text-align:center; padding:7px 4px; font-family:'Courier New', monospace;
@@ -117,6 +125,10 @@
 </head>
 <body>
 <div class="wrap">
+  <div class="clock-bar" id="clockBar">
+    <span id="clockDisplay">TIME: 00:00</span>
+    <span id="penaltyDisplay"></span>
+  </div>
   <div class="folder-tabs" id="tabs"></div>
   <div class="folder" id="folder"></div>
 </div>
@@ -145,7 +157,7 @@ const notes = [
         ["intitle:", "Finds pages with that word in the page's title.", "intitle:sentencing reform"],
       ]},
     ],
-    callout: { label: "FIELD NOTE", text: "Combining operators makes searches even sharper \u2014 for example: site:.gov \u201cjuvenile detention\u201d \u2212adult finds only government sources with that exact phrase, while leaving out results about adult detention." },
+    callout: { label: "FIELD NOTE", text: "Combining operators makes searches even sharper \u2014 for example: site:.edu \u201cmental illness incarceration\u201d \u2212statistics finds .edu sources with that exact phrase, while filtering out results that are mostly just statistical data tables." },
   },
   { // Station 2
     title: "The CRAAP Test",
@@ -185,9 +197,9 @@ const notes = [
     headers: ["Source Type", "General Format", "Example"],
     groups: [
       { label: null, rows: [
-        ["Webpage", "Author (if available). \u201cWebpage Title.\u201d Website, Publisher, Publication date, URL.", "\u201cRace and Drug Sentencing in America.\u201d The Sentencing Project, 2023, sentencingproject.org."],
-        ["Entire Print Book", "Last, First. Title of Book. Publisher, Publication date.", "Stevenson, Bryan. Just Mercy. Spiegel & Grau, 2014."],
-        ["Database Journal Article", "Last, First. \u201cTitle of Article.\u201d Journal, vol. #, no. #, date, pp. #\u2013##. Database, URL.", "Greiner, Romy. \u201cFactors Influencing Farmers' Participation.\u201d Australian Journal of Agricultural Economics, 2015, pp. 1\u201321. Wiley Online Library."],
+        ["Webpage", "Author (if available). \u201cWebpage Title.\u201d Website, Publisher, Publication date, URL.", "\u201cADHD, By the Numbers.\u201d <i>ADDitude</i>, New Hope Media LLC, 15 Nov. 2017, www.additudemag.com/the-statistics-of-adhd/."],
+        ["Entire Print Book", "Last, First. <i>Title of Book</i>. Publisher, Publication date.", "Jacobs, Alan. <i>The Pleasures of Reading in an Age of Distraction</i>. Oxford UP, 2011."],
+        ["Database Journal Article", "Last, First. \u201cTitle of Article.\u201d Journal, vol. #, no. #, date, pp. #\u2013##. Database, URL.", "Greiner, Romy. \u201cFactors Influencing Farmers' Participation.\u201d <i>Australian Journal of Agricultural Economics</i>, 2015, pp. 1\u201321. <i>Wiley Online Library</i>."],
       ]},
     ],
     callout: { label: "FIELD NOTE", text: "Citation generators like mybib.com are helpful but not perfect \u2014 always double-check punctuation, italics, and quotation marks against a real example." },
@@ -217,7 +229,7 @@ const notes = [
 const stations = [
   {
     label: "STATION 1 of 5", title: "Locate the Files", skill: "Library Research & Search Strategy",
-    code: "TRACKED", codeCaption: "You've tracked down a focused search strategy.",
+    code: "UNCOVERED", codeCaption: "You've uncovered a focused search strategy.",
     questions: [
       { prompt: "Your topic category is <b>Drug-Related Laws</b> (racial disparities in sentencing). Which search phrase is most likely to return focused, usable results?",
         options: [
@@ -244,7 +256,7 @@ const stations = [
   },
   {
     label: "STATION 2 of 5", title: "The CRAAP Trap", skill: "Evaluating Sources with the CRAAP Test",
-    code: "RELIABLE", codeCaption: "You've flagged an unreliable source before it made it into your essay.",
+    code: "SCREENED", codeCaption: "You've screened out an unreliable source before it made it into your essay.",
     questions: [
       { prompt: "A source: a website article titled \u201cWhy Sentencing Is Broken,\u201d posted on a personal blog. No author listed, no sources cited, published in 2011. Which CRAAP category raises the BIGGEST red flag?",
         options: [
@@ -271,7 +283,7 @@ const stations = [
   },
   {
     label: "STATION 3 of 5", title: "In Your Own Words", skill: "Paraphrasing Evidence",
-    code: "UNIQUE", codeCaption: "You've put the evidence in your own, unique words.",
+    code: "TRANSLATED", codeCaption: "You've translated the evidence into your own words.",
     questions: [
       { prompt: "Original passage: <i>\u201cThe client had never been arrested before, but a single detail \u2014 his truck seen near the scene \u2014 became the centerpiece of the prosecution's case, despite no physical evidence tying him to the crime.\u201d</i><br><br>Which option is an <b>acceptable paraphrase</b>?",
         options: [
@@ -298,21 +310,21 @@ const stations = [
   },
   {
     label: "STATION 4 of 5", title: "Cite It Right", skill: "Using mybib.com to Build a Works Cited Entry",
-    code: "SOURCED", codeCaption: "Your evidence is now properly sourced and citable.",
+    code: "REFERENCED", codeCaption: "Your evidence is now properly referenced and citable.",
     questions: [
       { prompt: "Source info: no individual author listed &middot; Title: \u201cRace and Drug Sentencing in America\u201d &middot; Website: The Sentencing Project &middot; sentencingproject.org &middot; published 2023. Which entry is correctly formatted MLA?",
         options: [
           { text: "2023. \u201cRace and Drug Sentencing in America.\u201d sentencingproject.org.", correct:false, fb:"MLA entries don't start with the date, and the website name is missing." },
           { text: "The Sentencing Project. Race and Drug Sentencing in America. 2023, sentencingproject.org.", correct:false, fb:"The article title needs quotation marks, not italics." },
           { text: "Sentencing Project, The. \u201cRace and Drug Sentencing in America\u201d sentencingproject.org 2023.", correct:false, fb:"Missing punctuation between elements and after the title's closing quotation mark." },
-          { text: "\u201cRace and Drug Sentencing in America.\u201d The Sentencing Project, 2023, sentencingproject.org.", correct:true, fb:"Correct MLA order and punctuation: title in quotes, website italicized as container, date, URL." },
+          { text: "\u201cRace and Drug Sentencing in America.\u201d <i>The Sentencing Project</i>, 2023, sentencingproject.org.", correct:true, fb:"Correct MLA order and punctuation: title in quotes, website italicized as container, date, URL." },
         ]},
       { prompt: "Which is the correctly formatted MLA Works Cited entry for the book <i>Just Mercy</i> by Bryan Stevenson, published by Spiegel & Grau in 2014?",
         options: [
-          { text: "Stevenson, Bryan. Just Mercy. Spiegel & Grau, 2014.", correct:true, fb:"Correct: Last, First. Title of Book. Publisher, Publication date." },
+          { text: "Stevenson, Bryan. <i>Just Mercy</i>. Spiegel & Grau, 2014.", correct:true, fb:"Correct: Last, First. Title of Book (italicized). Publisher, Publication date." },
           { text: "Bryan Stevenson. \u201cJust Mercy.\u201d Spiegel & Grau, 2014.", correct:false, fb:"Author name isn't inverted, and book titles are italicized, not quoted." },
-          { text: "Stevenson, B. (2014). Just Mercy. Spiegel & Grau.", correct:false, fb:"This is APA style, not MLA." },
-          { text: "Just Mercy. Stevenson, Bryan. 2014, Spiegel & Grau.", correct:false, fb:"Wrong element order \u2014 title should not come first." },
+          { text: "Stevenson, B. (2014). <i>Just Mercy</i>. Spiegel & Grau.", correct:false, fb:"This is APA style, not MLA." },
+          { text: "<i>Just Mercy</i>. Stevenson, Bryan. 2014, Spiegel & Grau.", correct:false, fb:"Wrong element order \u2014 title should not come first." },
         ]},
       { prompt: "Which of these is NOT one of the MLA 9 core elements used to build a Works Cited entry?",
         options: [
@@ -325,7 +337,7 @@ const stations = [
   },
   {
     label: "STATION 5 of 5", title: "Paper Perfect", skill: "MLA Formatting & In-Text Citations",
-    code: "TIDY", codeCaption: "Your paper is properly formatted and cited \u2014 case file complete.",
+    code: "TIGHTENED", codeCaption: "You've tightened up your formatting and citations \u2014 case file complete.",
     questions: [
       { prompt: "Which sentence is correctly formatted per this assignment's MLA rules (lead-in + embedded quote + correct in-text citation)?",
         options: [
@@ -359,6 +371,35 @@ let stationIdx = 0;
 let phase = 'notes'; // 'notes' | 'question'
 let questionIdx = 0;
 let collected = [];
+
+// --- Clock ---
+let startTime = Date.now();
+let penaltySeconds = 0;
+let clockInterval = null;
+
+function formatTime(totalSeconds){
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+function getElapsed(){
+  return Math.floor((Date.now() - startTime) / 1000) + penaltySeconds;
+}
+function tickClock(){
+  const el = document.getElementById('clockDisplay');
+  if(el) el.textContent = 'TIME: ' + formatTime(getElapsed());
+}
+function startClock(){
+  if(clockInterval) clearInterval(clockInterval);
+  clockInterval = setInterval(tickClock, 1000);
+  tickClock();
+}
+function addPenalty(){
+  penaltySeconds += 60;
+  tickClock();
+  const pd = document.getElementById('penaltyDisplay');
+  if(pd) pd.textContent = '+' + Math.floor(penaltySeconds/60) + ' min penalty';
+}
 
 function renderTabs(){
   const tabs = document.getElementById('tabs');
@@ -494,6 +535,8 @@ function handleAnswer(idx){
   } else {
     chosenBtn.classList.add('wrong');
     fb.classList.add('bad'); fb.classList.remove('good');
+    addPenalty();
+    fb.textContent += ' (+1 minute penalty)';
     setTimeout(()=>{
       chosenBtn.disabled = false;
       chosenBtn.classList.remove('wrong');
@@ -504,22 +547,48 @@ function handleAnswer(idx){
 
 function renderFinal(){
   document.getElementById('tabs').innerHTML = stations.map((s,i)=>`<div class="tab done">FILE ${i+1}</div>`).join('');
+  clearInterval(clockInterval);
   const f = document.getElementById('folder');
+  const letters = collected.map(c=>c[0]); // in station order — already a genuine scramble, not TRUST in order
   f.innerHTML = `
     <div class="final">
-      <div class="stamp granted">CASE<br>CLOSED</div>
-      <h1>Research Clearance Granted</h1>
-      <div class="subtitle">EQUAL JUSTICE RESEARCH INITIATIVE &mdash; CASE FILE COMPLETE</div>
+      <div class="stamp granted">CASE<br>NEARLY<br>CLOSED</div>
+      <h1>Final Checkpoint</h1>
+      <div class="subtitle">EQUAL JUSTICE RESEARCH INITIATIVE &mdash; ALL 5 FILES CLEARED</div>
       <p style="font-size:15px; line-height:1.6;">You cleared all five checkpoints (15 questions total). Here's the trail of code words you collected:</p>
       <div class="code-trail">
         ${collected.map(c=>`<div class="code-chip">${c}</div>`).join('')}
       </div>
-      <p style="font-size:15px;">Read the first letter of each word in order:</p>
-      <div class="final-word">${collected.map(c=>c[0]).join('')}</div>
-      <p style="font-size:15px; line-height:1.6;">You can <b>TRUST</b> the research you gather this way &mdash; it's tracked, reliable, in your own words, properly sourced, and correctly formatted. That's exactly what Paragraphs 2 and 3 of your essay need.</p>
-      <button class="restart" onclick="restart()">Restart Escape Room</button>
+      <p style="font-size:15px; line-height:1.6;">Each code word starts with one letter. Below are all five starting letters, in the order you earned them. Unscramble them to find the secret word that closes your case file.</p>
+      <div class="final-word" id="scrambledLetters">${letters.join(' ')}</div>
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:10px;">
+        <input type="text" id="unscrambleInput" placeholder="Type the unscrambled word..." style="font-family:'Courier New',monospace; font-size:16px; padding:10px 12px; border:2px solid var(--ink); border-radius:6px; flex:1; min-width:180px; letter-spacing:2px; text-transform:uppercase;">
+        <button class="restart" id="checkAnswerBtn" style="margin-top:0;">Check Answer</button>
+      </div>
+      <div class="feedback" id="finalFb"></div>
+      <div id="finalReveal" style="display:none;">
+        <p style="font-size:15px; line-height:1.6; margin-top:14px;">You can <b>TRUST</b> the research you gather this way &mdash; it's tracked down, screened, translated, referenced, and tightened up. That's exactly what you'll need for your Just Mercy essay.</p>
+        <p id="finalTimeLine" style="font-family:'Courier New',monospace; font-size:13px; color:var(--navy);"></p>
+      </div>
+      <button class="restart" onclick="restart()" style="margin-top:14px;">Restart Escape Room</button>
     </div>
   `;
+  document.getElementById('checkAnswerBtn').onclick = ()=>{
+    const val = document.getElementById('unscrambleInput').value.trim().toUpperCase();
+    const fb = document.getElementById('finalFb');
+    fb.classList.add('show');
+    if(val === 'TRUST'){
+      fb.classList.add('good'); fb.classList.remove('bad');
+      fb.textContent = 'Correct! Case file unlocked.';
+      document.getElementById('finalReveal').style.display = 'block';
+      document.getElementById('finalTimeLine').textContent = 'Final time: ' + formatTime(getElapsed());
+      document.getElementById('checkAnswerBtn').disabled = true;
+      document.getElementById('unscrambleInput').disabled = true;
+    } else {
+      fb.classList.add('bad'); fb.classList.remove('good');
+      fb.textContent = 'Not quite \u2014 rearrange the letters above and try again.';
+    }
+  };
 }
 
 function restart(){
@@ -527,10 +596,16 @@ function restart(){
   phase = 'notes';
   questionIdx = 0;
   collected = [];
+  startTime = Date.now();
+  penaltySeconds = 0;
+  const pd = document.getElementById('penaltyDisplay');
+  if(pd) pd.textContent = '';
+  startClock();
   renderNotesPage();
   window.scrollTo(0,0);
 }
 
+startClock();
 renderNotesPage();
 </script>
 </body>
