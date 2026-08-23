@@ -368,7 +368,7 @@ const stations = [
 // STATE + RENDER
 // ============================================================
 let stationIdx = 0;
-let phase = 'notes'; // 'notes' | 'question'
+let phase = 'brief'; // 'brief' | 'notes' | 'question'
 let questionIdx = 0;
 let collected = [];
 
@@ -404,13 +404,38 @@ function addPenalty(){
 function renderTabs(){
   const tabs = document.getElementById('tabs');
   tabs.innerHTML = '';
+  const briefTab = document.createElement('div');
+  briefTab.className = 'tab' + (phase === 'brief' ? ' active' : ' done');
+  briefTab.textContent = 'MISSION';
+  tabs.appendChild(briefTab);
   stations.forEach((s,i)=>{
     const d = document.createElement('div');
-    const isActive = i === stationIdx;
+    const isActive = phase !== 'brief' && i === stationIdx;
     d.className = 'tab' + (isActive ? ' active' : '') + (i < stationIdx ? ' done' : '');
     d.textContent = 'FILE ' + (i+1);
     tabs.appendChild(d);
   });
+}
+
+function renderBrief(){
+  renderTabs();
+  const f = document.getElementById('folder');
+  f.innerHTML = `
+    <div class="stamp">CLASSIFIED</div>
+    <span class="station-label">MISSION BRIEFING</span>
+    <h1>Equal Justice Research Initiative</h1>
+    <div class="subtitle">NEW CASE ASSIGNMENT</div>
+    <p class="notes-intro" style="font-size:15px;">A wrongful conviction case has landed on your desk. Before your team can help build a fair, well-supported defense, you need airtight research skills \u2014 the kind Bryan Stevenson relies on every day at the Equal Justice Initiative.</p>
+    <p class="notes-intro" style="font-size:15px;">Five case files stand between you and full research clearance. Each one tests a different skill you'll need for your own <i>Just Mercy</i> essay: locating credible sources, evaluating them, paraphrasing evidence, citing your sources, and formatting your paper correctly.</p>
+    <div class="callout"><span class="lbl">MISSION PARAMETERS</span>Work through all 5 case files in order. Each file has a Notes page to read first, then 3 questions \u2014 answer all 3 correctly to earn that file's code word. Every wrong answer costs your team a 1-minute penalty. The clock starts the moment you accept this mission and won't stop until you crack the final code.</div>
+    <button class="continue show" id="acceptMissionBtn">Accept Mission &amp; Start Clock \u2192</button>
+  `;
+  document.getElementById('acceptMissionBtn').onclick = ()=>{
+    startClock();
+    phase = 'notes';
+    renderNotesPage();
+    window.scrollTo(0,0);
+  };
 }
 
 function renderNotesTable(n){
@@ -593,20 +618,21 @@ function renderFinal(){
 
 function restart(){
   stationIdx = 0;
-  phase = 'notes';
+  phase = 'brief';
   questionIdx = 0;
   collected = [];
+  clearInterval(clockInterval);
   startTime = Date.now();
   penaltySeconds = 0;
   const pd = document.getElementById('penaltyDisplay');
   if(pd) pd.textContent = '';
-  startClock();
-  renderNotesPage();
+  const cd = document.getElementById('clockDisplay');
+  if(cd) cd.textContent = 'TIME: 00:00';
+  renderBrief();
   window.scrollTo(0,0);
 }
 
-startClock();
-renderNotesPage();
+renderBrief();
 </script>
 </body>
 </html>
